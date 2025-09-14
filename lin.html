@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google账号登录示例</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center mb-6">使用Google账号登录</h2>
+        
+        <!-- Google登录按钮 -->
+        <div id="g_id_onload"
+             data-client_id="你的Google客户端ID"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
+        </div>
+        
+        <p class="mt-6 text-center text-gray-600 text-sm">
+            没有Gmail账号？请<a href="https://accounts.google.com/signup" target="_blank" class="text-blue-600 hover:underline">前往Google官方网站注册</a>
+        </p>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        // 处理Google登录回调
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            
+            // 在这里可以将token发送到你的后端进行验证
+            fetch('/api/verify-google-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: response.credential })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('登录成功！');
+                    // 登录成功后可以跳转到其他页面
+                    // window.location.href = '/dashboard';
+                } else {
+                    alert('登录失败：' + data.message);
+                }
+            })
+            .catch(error => console.error('验证过程出错：', error));
+        }
+    </script>
+</body>
+</html>
